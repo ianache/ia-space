@@ -1,6 +1,10 @@
 # ia-space
 Espacio de proyectos relacionados a IA
 
+```Powersheel
+irm https://astral.sh/uv/install.ps1 | iex
+```
+
 ## MCP Servers
 
 Se han creado los proyectos para los servicios usando el siguiente comando
