@@ -1,0 +1,60 @@
+from fastapi import FastAPI
+from fastmcp import FastMCP
+from fastapi_mcp import FastApiMCP
+from pydantic import BaseModel
+
+#from fastapi.middleware.cors import CORSMiddleware
+# from fastapi_mcp import FastApiMCP
+from dotenv import load_dotenv
+
+load_dotenv()
+# Load environment variables from .env file
+
+app = FastAPI(
+    title="MCP Devices API", 
+    description="API for managing devices", 
+    version="1.0.0")
+# Set up CORS middleware
+#app.add_middleware(
+#    CORSMiddleware,
+#    allow_origins=["*"],
+#    allow_credentials=True,
+#    allow_methods=["*"],
+#    allow_headers=["*"],
+#)
+
+@app.get("/new_device",operation_id="new_device",summary="Register a new device (GPS, Dashcam, etc.)")
+async def new_device(imei: str, linenumner: str, operator: str, type: str):
+    """
+    Register a new device (GPS, Dashcam, etc.)
+    Parameters:
+    - imei: IMEI number of the device
+    - linenumner: Line number of the device
+    - operator: Operator of the device
+    - type: Type of the device (e.g., GPS, Dashcam)
+    Returns:
+    - id: Unique identifier for the device
+    - message: Confirmation message
+    """
+    return {"id": "New generated id", "message": "Device registered successfully"}
+
+#mcp = FastMCP.from_fastapi(
+#    app=app, 
+#    timeout=5.0
+#)
+#
+#if __name__ == "__main__":
+#    mcp.run()
+
+mcp = FastApiMCP(
+    app, 
+    name="mcp-devices",
+    description="MCP devices server"
+)
+mcp.mount()
+
+#def main():
+#    print("Hello from mcp-devices!")
+#
+#if __name__ == "__main__":
+#    main()

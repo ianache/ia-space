@@ -1,0 +1,32 @@
+from fastmcp import FastMCP
+from dotenv import load_dotenv
+from fastapi import FastAPI
+
+load_dotenv()
+
+app = FastAPI(
+    title="MCP Devices API",
+    description="API for managing devices",
+    version="1.0.0"
+)
+
+
+# Configure during initialization
+mcp = FastMCP(
+    name="mcp-devices",
+    description="MCP devices server",
+    port=8080, # Directly maps to ServerSettings
+    on_duplicate_tools="error" # Set duplicate handling
+)
+
+@mcp.tool()
+def greet(name: str) -> str:
+    """Greet a user by name."""
+    return f"Hello, {name}!"
+
+# Settings are accessible via mcp.settings
+print(mcp.settings.port) # Output: 8080
+print(mcp.settings.on_duplicate_tools) # Output: "error"
+
+if __name__ == "__main__":
+    mcp.run()
