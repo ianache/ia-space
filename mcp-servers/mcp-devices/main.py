@@ -1,14 +1,13 @@
 from fastmcp import FastMCP, Context
 import uvicorn
 import os
+from services import DeviceService
+from config import configuration
 
 version = "0.1.0"
-mcp = FastMCP(name="MyServer")
-#http_app = app.http_app()
+mcp = FastMCP(name="MCP Devices")
 
-MCP_PORT    = int(os.getenv("PORT", 8000))
-MCP_HOST   = os.getenv("HOST", "0.0.0.0")
-MCP_TRANSPORT = os.getenv("TRANSPORT", "sse") #"streamable-http")
+service = DeviceService(configuration)
 
 @mcp.resource("config://version")
 def get_version(): 
@@ -24,6 +23,31 @@ def get_profile(user_id: str):
 async def add_device(imei: str, ctx: Context) -> str:
     """Add a new device (GPS, Dashcam, etc.)"""
     await ctx.info(f"Processing {imei}...")
-    return { "id": "11111111111", "message": "Device added successfully" }
+    return service.add_device (
+        imei=imei, 
+        obc="1234567890", 
+        linenumber="1234567890", 
+        operator="CLARO"
+    )
 
-mcp.run(transport=MCP_TRANSPORT, host=MCP_HOST, port=MCP_PORT, path="/mcp")
+@mcp.tool(name="remove_device", description="Remove a device")
+async def remove_device(imei: str, ctx: Context) -> str:
+    """Remove a device (GPS, Dashcam, etc.)"""
+    await ctx.info(f"Processing {imei}...")
+    return { 
+        "id": "22222222222", 
+        "message": "Device removed successfully" 
+    }
+
+@mcp.tool(name="get_device", description="Get device information")
+async def get_device(imei: str, ctx: Context) -> str:
+    """Get device information (GPS, Dashcam, etc.)"""
+    await ctx.info(f"Processing {imei}...")
+    return service.get_device (id=imei)
+
+mcp.run(
+    transport=configuration.MCP_TRANSPORT, 
+    host=configuration.MCP_HOST, 
+    port=configuration.MCP_PORT, 
+    path="/mcp"
+)
