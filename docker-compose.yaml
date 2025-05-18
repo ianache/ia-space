@@ -71,7 +71,9 @@ services:
     # CREATE EXTENSION vector;
     volumes:
     - pgvector-data:/var/lib/postgresql/data
-
+    networks:
+      - backend
+      
   # Neo4j: Base de datos de grafos, ideal para almacenar y consultar
   neo4j:
     image: neo4j:latest #5.21.0
