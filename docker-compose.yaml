@@ -45,11 +45,13 @@ services:
 
   # Redis: Almacenamiento en memoria clave-valor, útil para caché y colas.
   redis:
-    image: redis:7.2-alpine
-    container_name: redis
-    command: ["redis-server", "--requirepass", "welcome1", "--user", "admin on >welcome1 ~* +@all"]
+    image: redis:6.2-alpine
+    restart: always
     ports:
-      - "6379:6379"
+    - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+    - redis-data:/data
     networks:
       - backend
 
@@ -97,3 +99,4 @@ volumes:
   neo4j-data:
   langflow:
   pgvector-data:
+  redis-data:
