@@ -26,7 +26,7 @@ services:
   # Langflow: Plataforma para construir y ejecutar flujos de trabajo de IA 
   # mediante una interfaz visual.
   langflow:
-    image: langflow/langflow:latest
+    image: langflowai/langflow:${LANGFLOW_VER:-1.4.1} #latest
     container_name: langflow
     ports:
       - "8080:8080"
