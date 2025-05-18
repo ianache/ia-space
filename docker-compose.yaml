@@ -98,6 +98,39 @@ services:
       traefik.http.routers.neo4j.rule: Host(`neo4j.lab.iap.com`)
       traefik.http.routers.neo4j.entrypoints: web
       traefik.http.services.neo4j.loadbalancer.server.port: 7474
+  
+  # n8n: Plataforma de automatización y orquestación de tareas.
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION:-1.91.3}
+    ports:
+      - 5678:5678
+    environment:
+      N8N_HOST: n8n.lab.iap.com # ${SUBDOMAIN}.${DOMAIN_NAME}
+      ##N8N_PORT: 5678
+      ##N8N_PROTOCOL: https
+      ##NODE_ENV: production
+      N8N_RUNNERS_ENABLED: true
+      N8N_SECURE_COOKIE: false
+      N8N_MFA_ENABLED: false
+      N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE: true
+      #N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: true
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_DATABASE: postgres
+      DB_POSTGRESDB_HOST: pgvector
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_USER: postgres
+      DB_POSTGRESDB_SCHEMA: public #n8ndb #public
+      DB_POSTGRESDB_PASSWORD: welcome1
+      N8N_ENCRYPTION_KEY: p0eqZitTTukzCs88Iu5PsyZ9cw2GDQsH
+    volumes:
+      - n8n-data:/home/node/.n8n
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'wget -qO- http://127.0.0.1:5678/'
+      interval: 5s
+      timeout: 20s
+      retries: 10
 
 networks:
   frontend:
@@ -108,3 +141,4 @@ volumes:
   langflow-data:
   pgvector-data:
   redis-data:
+  n8n-data:
