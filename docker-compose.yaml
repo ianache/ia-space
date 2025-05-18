@@ -131,6 +131,11 @@ services:
       interval: 5s
       timeout: 20s
       retries: 10
+    labels:
+      traefik.enable: true
+      traefik.http.routers.n8n.rule: Host(`n8n.lab.iap.com`)
+      traefik.http.routers.n8n.entrypoints: web
+      traefik.http.services.n8n.loadbalancer.server.port: 5678
 
 networks:
   frontend:
