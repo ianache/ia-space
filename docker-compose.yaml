@@ -27,24 +27,22 @@ services:
   # mediante una interfaz visual.
   langflow:
     image: langflowai/langflow:${LANGFLOW_VER:-1.4.1} #latest
-    container_name: langflow
+    pull_policy: always
+    restart: always
     ports:
-      - "8080:8080"
+      - "7860:7860"
     volumes:
-      - ./langflow:/app/langflow
+      - langflow-data:/app/langflow
     env_file:
     - .env-langflow
-    environment:
-      # openssl rand -base64 30 | tr -dc 'A-Za-z0-9' | head -c20
-      - LANGFLOW_API_KEY=${LANGFLOW_API_KEY}
-      - LANGFLOW_API_URL=http://langflow.lab.iap.com:8080/api
     networks:
       - frontend
       - backend
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.langflow.rule=Host(`langflow.lab.iap.com`)"
-
+      traefik.enable: true
+      traefik.http.routers.langflow.rule: Host(`langflow.lab.iap.com`)"
+      traefik.http.routers.langflow.entrypoints: web
+      traefik.http.services.langflow.loadbalancer.server.port: 7860
   # Redis: Almacenamiento en memoria clave-valor, útil para caché y colas.
   redis:
     image: redis:6.2-alpine
@@ -103,6 +101,6 @@ networks:
 
 volumes:
   neo4j-data:
-  langflow:
+  langflow-data:
   pgvector-data:
   redis-data:
