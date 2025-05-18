@@ -1,0 +1,99 @@
+services:
+  # Traefik: Proxy inverso que enruta el tráfico HTTP a los servicios 
+  # internos según reglas y dominios configurados.
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+      - "8081:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.rule: Host(`traefik.lab.iap.com`)
+      traefik.http.routers.traefik.entrypoints: web
+      traefik.http.services.traefik.loadbalancer.server.port: 8080
+    networks:
+      - frontend
+      - backend
+
+  # Langflow: Plataforma para construir y ejecutar flujos de trabajo de IA 
+  # mediante una interfaz visual.
+  langflow:
+    image: langflow/langflow:latest
+    container_name: langflow
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./langflow:/app/langflow
+    environment:
+      # openssl rand -base64 30 | tr -dc 'A-Za-z0-9' | head -c20
+      - LANGFLOW_API_KEY=${LANGFLOW_API_KEY}
+      - LANGFLOW_API_URL=http://langflow.lab.iap.com:8080/api
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.langflow.rule=Host(`langflow.lab.iap.com`)"
+
+  # Redis: Almacenamiento en memoria clave-valor, útil para caché y colas.
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    command: ["redis-server", "--requirepass", "welcome1", "--user", "admin on >welcome1 ~* +@all"]
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  pgvector:
+    image: ankane/pgvector:${PGVECTOR_VER:-latest}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: welcome1
+      POSTGRES_DB: pgvector
+    #ports:
+    #  - "5432:5432"
+    # CREATE EXTENSION vector;
+    volumes:
+    - pgvector-data:/var/lib/postgresql/data
+
+  # Neo4j: Base de datos de grafos, ideal para almacenar y consultar
+  neo4j:
+    image: neo4j:latest #5.21.0
+    ports:
+    - "7474:7474" # HTTP
+    - "7687:7687" # Bolt
+    volumes:
+    - neo4j-data:/data
+    env_file:
+    - .env-neo4j
+    environment:
+    - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+    #healthcheck:
+    #  test: ["CMD", "neo4j", "status"]
+    #  interval: 10s
+    #  timeout: 5s
+    #  retries: 5
+    labels:
+      traefik.enable: true
+      traefik.http.routers.neo4j.rule: Host(`neo4j.lab.iap.com`)
+      traefik.http.routers.neo4j.entrypoints: web
+      traefik.http.services.neo4j.loadbalancer.server.port: 7474
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  neo4j-data:
+  langflow:
+  pgvector-data:
