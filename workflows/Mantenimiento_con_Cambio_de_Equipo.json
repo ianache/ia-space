@@ -1,0 +1,220 @@
+{
+  "name": "Mantenimiento con Cambio de Equipo",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Mantenimiento con Cambio de Equipo",
+        "formDescription": "Permite registrar una solicitud para el registro de un Mantenimiento con Cambio de Equipos",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "placa/motor",
+              "placeholder": "Numero de motor o placa",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "IMEI/OBC",
+              "placeholder": "IMEI/OBC de nuevo dispositivo",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "IMEI/OBC Actual",
+              "placeholder": "IMEI/OBC de actual dispositivo instalado"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Registrar",
+          "path": "mantenimiento-cambio-equipo"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -760,
+        -40
+      ],
+      "id": "38eda180-0aa7-4d1f-ab9c-2156850284d5",
+      "name": "On form submission",
+      "webhookId": "71a9fb73-adc5-4e8d-8f8d-f6baa6cb41ac",
+      "notesInFlow": true,
+      "notes": "Registro de mantenimiento con cambio de equipo"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Registrar mantenimiento con cambio de equipo para unidad con placa/motor {{ $json['placa/motor'] }}, dispositivo actual {{ $json['IMEI/OBC Actual'] }} y dispositivo nuevo {{ $json['IMEI/OBC'] }}.\n\nINSTRUCCIONES:\n1. Utilizar las herramientas disponibles para completar el proceso de Registro de Mantenimiento con Cambio de Equipo.\n2. Utilizar la herramienta \"send_email\" para notificar el resultado de la operación.\n\nPROCEDIMIENTO:\n\n1. Registrar vinculacion del dispositivo a la unidad usando la herramienta \"attach_device\"\n2. Desactivar actual dispositivo utilizando la herramienta \"deactivate_device\"\n3. Enviar correo con resultado de la operación utilizando la herramienta \"send_email\"\n\nFecha actual: {{ $today }}",
+        "options": {
+          "systemMessage": "Eres un asistente especializado en atender Mantenimientos de Equipamiento en unidades (vehiculos, scooter, persona, moto, u otra cosa a la que se le puede instalar un dispositivo GPS)"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -440,
+        -40
+      ],
+      "id": "873d7cd1-fc44-4d9d-bd94-57caac9021b5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-04-17",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        200
+      ],
+      "id": "8c15fdd1-b052-4a92-829b-7130bd653d6a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MZ7y1etvrZbAd377",
+          "name": "GEMINI_PERSONAL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "http://192.168.1.49:8000/mcp",
+        "include": "selected",
+        "includeTools": [
+          "add_device",
+          "attach_device",
+          "deactivate_device"
+        ]
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        200
+      ],
+      "id": "2604cd0a-0538-4160-9cfd-3240f7ae8885",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "content": "Activar formulario Web para el registro del mantenimiento",
+        "height": 500,
+        "width": 280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -840,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "b6618709-5293-43e9-8677-d9bfb3640783",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Activar formulario Web para el registro del mantenimiento",
+        "height": 500,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -540,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "6de11850-da73-4fed-aff0-08ab05b28c7c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreplay@comsatel.com.pe",
+        "toEmail": "ianache@comsatel.com.pe",
+        "subject": "[Agente IA] Mantenimiento con Cambio de Equipo",
+        "html": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('HTML', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSendTool",
+      "typeVersion": 2.1,
+      "position": [
+        -180,
+        200
+      ],
+      "id": "a8e15090-7d8d-471f-a28b-a9a514743b75",
+      "name": "send_email",
+      "webhookId": "1c577184-c1ca-49b6-992a-30c52d1f504e",
+      "credentials": {
+        "smtp": {
+          "id": "pGGXS47mSqCFnlz0",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "send_email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e83c4f4f-9599-4589-aa86-cde65017b91c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f222c6c6135ff266ae8d7d94c4d1facc3dc70f6ff0b8c2d8b10c146a337f838"
+  },
+  "id": "hEb7ha2U834Eb9xv",
+  "tags": []
+}
