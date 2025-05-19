@@ -46,10 +46,11 @@ uv run fastmcp  run main.py:mcp
 ```sh
 npx @modelcontextprotocol/inspector
 ```
-
 Acceder a URL: http://127.0.0.1:6274
 
-# Servidores MCP integrados a IDE Visual Studio COde
+![Web de Inspector](images/mcp_inspector_execute.png)
+
+# Servidores MCP integrados a IDE Visual Studio Code
 
 ## Playwright (interacción con exploradores Web)
 
