@@ -80,7 +80,7 @@
     },
     {
       "parameters": {
-        "sseEndpoint": "http://192.168.1.49:8000/mcp",
+        "sseEndpoint": "http://mcp-devices:8000/mcp",
         "include": "selected",
         "includeTools": [
           "add_device",
@@ -132,7 +132,7 @@
         "fromEmail": "noreplay@comsatel.com.pe",
         "toEmail": "ianache@comsatel.com.pe",
         "subject": "[Agente IA] Mantenimiento con Cambio de Equipo",
-        "html": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('HTML', ``, 'string') }}",
+        "html": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('HTML', `INSTRUCCIONES:\n1. Enumerar cada paso ejecutado siguiendo el formato \"Paso: <Nombre del paso>\".\n2. Incluir en cada paso los datos empleados en la llamada a la herramienta usando el formato <parametro>: <valor>\n3. Incluir al final la fecha y hora en formato UTC-05 (Lima, Perú)\n4. No incluir nombre de las herramientas utilizadas.\n\nEJEMPLO:\n\n<h1>Registro de Mantenimiento con Cambio de Equipo Completado</h1>\n<p>Se ha completado el proceso de registro de mantenimiento con cambio de equipo para la unidad con placa/motor C2Q145.</p>\n\n<h1>Detalles de la Operación:</h1>\n<ul>\n<li>Unidad: C2Q145</li>\n<li>Dispositivo Anterior: 0000000000001 (Desactivado)</li>\n<li>Dispositivo Nuevo: 0000000000002 (Vinculado)</li>\n</ul>\n\n<h1>Resultados:</h1>\n<h2>Vinculación del nuevo dispositivo a la unidad</h2>\n<ol>\n<li>imei/obc del dispositivo: 0000000000002</li>\n<li>Unidad: C2Q145</li>\n</ol>\n\n<h2>Desactivación del dispositivo anterior</h2>\n<ol>\n<li>imei/obc del dispositivo: 0000000000001</li>\n</ol>\n\n<p><b>Fecha de la operación:</b> 2025-05-19T00:00:00.000-04:00</p>`, 'string') }}",
         "options": {
           "appendAttribution": false
         }
@@ -210,7 +210,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "e83c4f4f-9599-4589-aa86-cde65017b91c",
+  "versionId": "b14d0b92-73de-4b9f-8399-3a4635c6b998",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "1f222c6c6135ff266ae8d7d94c4d1facc3dc70f6ff0b8c2d8b10c146a337f838"
