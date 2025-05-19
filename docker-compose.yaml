@@ -124,6 +124,9 @@ services:
       N8N_ENCRYPTION_KEY: p0eqZitTTukzCs88Iu5PsyZ9cw2GDQsH
     volumes:
       - n8n-data:/home/node/.n8n
+    networks:
+      - frontend
+      - backend
     healthcheck:
       test:
         - CMD-SHELL
