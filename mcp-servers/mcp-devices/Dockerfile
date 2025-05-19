@@ -1,8 +1,8 @@
 # Use official Python image with uv pre-installed
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 # Install uv (if not present in the base image)
-RUN pip install uv
+#RUN pip install uv
 
 # Set work directory
 WORKDIR /app
