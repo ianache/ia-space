@@ -1,0 +1,12 @@
+
+networks:
+  ia-space_backend:
+    external: true
+
+services:
+  mcp-devices:
+    image: xnetcorp/mcp-devices:0.1.0
+    ports:
+      - "8000:8000"
+    networks:
+      - ia-space_backend
