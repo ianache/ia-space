@@ -1,11 +1,19 @@
+import os
 import anyio
 import click
 import mcp.types as types
 from mcp.server.lowlevel import Server
+from template_server import TemplatesServer
+import logging
 
+logging.basicConfig(level=logging.INFO)
+
+templates_server = TemplatesServer()
+logging.info(templates_server)
 
 def create_messages(
-    context: str | None = None, topic: str | None = None
+        context: str | None = None, 
+        topic: str | None = None
 ) -> list[types.PromptMessage]:
     """Create the messages for the prompt."""
     messages = []
@@ -36,49 +44,6 @@ def create_messages(
 
     return messages
 
-MY_PROMPTS = []
-
-PROMPTS = [
-        #types.Prompt(
-        #    name="simple",
-        #    description="A simple prompt that can take optional context and topic "
-        #    "arguments",
-        #    arguments=[
-        #        types.PromptArgument(
-        #            name="context",
-        #            description="Additional context to consider",
-        #            required=False,
-        #        ),
-        #        types.PromptArgument(
-        #            name="topic",
-        #            description="Specific topic to focus on",
-        #            required=False,
-        #        ),
-        #    ],
-        #),
-        types.Prompt(
-            name="poem",
-            description="Writing a poem.",
-            arguments=[]
-        )
-    ]
-
-TOOLS = [
-    types.Tool(
-        name="poem",
-        description="Writing a poem.",
-        inputSchema={
-            "type": "object",
-            "properties": {
-                "topic": {
-                    "type": "string",
-                    "description": "The topic of the poem",
-                },
-            },
-            "required": ["topic"]
-        },
-    )
-]
 
 @click.command()
 @click.option("--port", default=8000, help="Port to listen on for SSE")
@@ -89,54 +54,74 @@ TOOLS = [
     help="Transport type",
 )
 def main(port: int, transport: str) -> int:
-    app = Server("mcp-simple-prompt")
+    app = Server("mcp-prompts")
 
     @app.list_prompts()
     async def list_prompts() -> list[types.Prompt]:
-        return PROMPTS
+        prompts = [
+            types.Prompt(
+                name="simple",
+                description="A simple prompt that can take optional context and topic "
+                "arguments",
+                arguments=[
+                    types.PromptArgument(
+                        name="context",
+                        description="Additional context to consider",
+                        required=False,
+                    ),
+                    types.PromptArgument(
+                        name="topic",
+                        description="Specific topic to focus on",
+                        required=False,
+                    ),
+                ],
+            )
+        ]
+
+        #for name, template in templates_server.templates.items():
+        #    prompts.append(types.Prompt(
+        #        name=name,
+        #        description="A simple prompt that can take optional context and topic "
+        #        "arguments",
+        #        arguments=[])
+        #    )
+
+        return prompts
     
+        return [
+            types.Prompt(
+                name=prompt.name,
+                description="A simple prompt that can take optional context and topic "
+                "arguments",
+                arguments=[
+                    types.PromptArgument(
+                        name=par.name,
+                        description=par.description,
+                        required=par.required,
+                    ) for par in prompt.config.parameters.items()
+                ],
+            ) for prompt in templates_server.templates
+        ]
+
     @app.get_prompt()
     async def get_prompt(
-        name: str, arguments: dict[str, str] | None = None
+        name: str, 
+        arguments: dict[str, str] | None = None
     ) -> types.GetPromptResult:
-        # Get the prompt by name
-        prompt = next((p for p in PROMPTS if p.name == name), None)
-
-        if prompt is None:  # Prompt not found
+        if name != "simple":
             raise ValueError(f"Unknown prompt: {name}")
-        
-        # Handle the "poem" prompt
+
+        if arguments is None:
+            arguments = {}
+
         return types.GetPromptResult(
-            messages = [
-                types.PromptMessage(
-                    role="user", 
-                    content=types.TextContent(
-                        type="text", 
-                        text="Write a poem."
-                    )
-                )
-            ],
+            messages=create_messages(
+                context=arguments.get("context"), 
+                topic=arguments.get("topic")
+            ),
             description="A simple prompt with optional context and topic arguments",
         )
 
-    @app.call_tool()
-    async def call_tool(
-        name: str, 
-        parameters: dict[str, str]
-    ) -> dict:
-        # Handle the "poem" tool
-        if name == "poem":
-            topic = parameters.get("topic", None)
-            return {
-                "result": f"Here is a poem about {topic}."
-            }
-        else:
-            raise ValueError(f"Unknown tool: {name}")
-
-    @app.list_tools()
-    async def list_tools() -> list[str]:
-        return TOOLS
-    
     if transport == "sse":
         from mcp.server.sse import SseServerTransport
         from starlette.applications import Starlette
@@ -177,3 +162,5 @@ def main(port: int, transport: str) -> int:
         anyio.run(arun)
 
     return 0
+
+
