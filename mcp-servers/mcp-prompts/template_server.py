@@ -1,5 +1,6 @@
-import os 
+import os
 import logging
+import yaml
 
 class TemplatesServer():
     def __init__(self):
@@ -11,16 +12,18 @@ class TemplatesServer():
         for category in os.listdir(templates_path):
             category_path = os.path.join(templates_path, category)
             logging.info(category_path)
-            if category in os.listdir(category_path):
+            # config.yaml and prompts.md must be present in the directory
+            if "config.yaml" in os.listdir(category_path) and \
+               "prompts.md" in os.listdir(category_path):
                 # Load config
                 with open(os.path.join(category_path, "config.yaml"), "r") as file:
                     config = yaml.safe_load(file)
-                with open(os.path.join(category_path, "template.md"), "r") as file:
-                    template = file.read()
+                with open(os.path.join(category_path, "prompts.md"), "r") as file:
+                    prompt_text = file.read()
                 
                 templates[category] = {
                     "config": config,
-                    "template": template
+                    "prompt_text": prompt_text
                 }
         return templates
                  
