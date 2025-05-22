@@ -1,19 +1,9 @@
-description: "COmprehensive meeting analysis template for detailed minutes and action items"
-version: "1.0"
+name: Meeting Analysis
+description: Analyzes a meeting transcript and provides a summary.
 arguments:
-  - name: meeting_date
-    description: "The date of the meeting"
-    required: true
-  - name: meeting_title
-    description: "The title or subject of the meeting"
-    required: true
   - name: transcript
-    description: "Full meeting transcript to analyze"
+    description: The full transcript of the meeting.
     required: true
-metadata:
-  tags:
-    - meetings
-    - analysis
-    - minutes
-  suggested_use: "Use for important strategic meetings, client meetings, or any meeting requiring detailed documentation."
-  outptut_format: "markdown"
+  - name: participant_count
+    description: The number of participants in the meeting.
+    required: false

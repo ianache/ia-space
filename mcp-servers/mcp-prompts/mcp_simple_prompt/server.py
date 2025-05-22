@@ -2,66 +2,8 @@ import anyio
 import click
 import mcp.types as types
 from mcp.server.lowlevel import Server
+from ..template_server import TemplatesServer
 
-
-def create_messages(
-    context: str | None = None, topic: str | None = None
-) -> list[types.PromptMessage]:
-    """Create the messages for the prompt."""
-    messages = []
-
-    # Add context if provided
-    if context:
-        messages.append(
-            types.PromptMessage(
-                role="user",
-                content=types.TextContent(
-                    type="text", text=f"Here is some relevant context: {context}"
-                ),
-            )
-        )
-
-    # Add the main prompt
-    prompt = "Please help me with "
-    if topic:
-        prompt += f"the following topic: {topic}"
-    else:
-        prompt += "whatever questions I may have."
-
-    messages.append(
-        types.PromptMessage(
-            role="user", content=types.TextContent(type="text", text=prompt)
-        )
-    )
-
-    return messages
-
-MY_PROMPTS = []
-
-PROMPTS = [
-        #types.Prompt(
-        #    name="simple",
-        #    description="A simple prompt that can take optional context and topic "
-        #    "arguments",
-        #    arguments=[
-        #        types.PromptArgument(
-        #            name="context",
-        #            description="Additional context to consider",
-        #            required=False,
-        #        ),
-        #        types.PromptArgument(
-        #            name="topic",
-        #            description="Specific topic to focus on",
-        #            required=False,
-        #        ),
-        #    ],
-        #),
-        types.Prompt(
-            name="poem",
-            description="Writing a poem.",
-            arguments=[]
-        )
-    ]
 
 TOOLS = [
     types.Tool(
@@ -90,33 +32,53 @@ TOOLS = [
 )
 def main(port: int, transport: str) -> int:
     app = Server("mcp-simple-prompt")
+    template_loader = TemplatesServer()
 
     @app.list_prompts()
     async def list_prompts() -> list[types.Prompt]:
-        return PROMPTS
+        prompts = []
+        for name, data in template_loader.templates.items():
+            config = data.get("config", {})
+            prompt_args = [
+                types.PromptArgument(
+                    name=arg.get("name"),
+                    description=arg.get("description"),
+                    required=arg.get("required", False),
+                )
+                for arg in config.get("arguments", [])
+            ]
+            prompts.append(
+                types.Prompt(
+                    name=name,
+                    description=config.get("description", ""),
+                    arguments=prompt_args,
+                )
+            )
+        return prompts
     
     @app.get_prompt()
     async def get_prompt(
-        name: str, arguments: dict[str, str] | None = None
+        name: str, arguments: dict[str, str] | None = None # Arguments are not used yet but might be in the future
     ) -> types.GetPromptResult:
-        # Get the prompt by name
-        prompt = next((p for p in PROMPTS if p.name == name), None)
-
-        if prompt is None:  # Prompt not found
+        template_data = template_loader.get_template(name)
+        if template_data is None:
             raise ValueError(f"Unknown prompt: {name}")
+
+        prompt_text = template_data.get("prompt_text", "")
+        config = template_data.get("config", {})
+        description = config.get("description", "")
+
+        # TODO: Handle argument substitution in prompt_text if needed in the future
+        # For now, we pass the raw prompt_text
         
-        # Handle the "poem" prompt
         return types.GetPromptResult(
-            messages = [
+            messages=[
                 types.PromptMessage(
-                    role="user", 
-                    content=types.TextContent(
-                        type="text", 
-                        text="Write a poem."
-                    )
+                    role="user",
+                    content=types.TextContent(type="text", text=prompt_text),
                 )
             ],
-            description="A simple prompt with optional context and topic arguments",
+            description=description,
         )
 
     @app.call_tool()
