@@ -1,0 +1,222 @@
+{
+  "name": "sub_ux-ui_designer",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "requirement"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        40,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d03cee89-df13-42b8-8a88-baa7886a9d28",
+              "name": "requirement",
+              "value": "={{ $json.requirement }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        220
+      ],
+      "id": "248f4e66-da43-42db-af71-1aaaf855c3b2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d03cee89-df13-42b8-8a88-baa7886a9d28",
+              "name": "requirement",
+              "value": "={{ $json.requirement }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        440
+      ],
+      "id": "3928a4ce-e713-4a65-8312-953ca5799f73",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        40,
+        440
+      ],
+      "id": "b25d9c96-2ae7-45d0-9446-0f0b20732a79",
+      "name": "When chat message received",
+      "webhookId": "e457c916-80a2-450d-8424-4de99c28cc38"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        520,
+        540
+      ],
+      "id": "b3376f71-46f4-47ab-8fa6-083f57d73b84",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "im6XXXHIbcTbzi7y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e5e20615-3621-4348-956f-cfdd234df6a6",
+              "name": "output",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        320
+      ],
+      "id": "8a131705-982b-4ef2-b0ce-0c29c5c16669",
+      "name": "set response"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role\n\nUser Interface (UI) / User Experience (UX) Designer\n\n# Scope\n\n{{ $json.requirement }}\n\n# Command\n\nStep 1: Define user experience requirements (Web applications)\n\nStep 2: Design a user interface.\n\n# Contraints",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        520,
+        320
+      ],
+      "id": "5d255434-38a4-4461-8d8a-e546e7c15f5c",
+      "name": "AI Agent - UX/UI Designer"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - UX/UI Designer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - UX/UI Designer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - UX/UI Designer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - UX/UI Designer": {
+      "main": [
+        [
+          {
+            "node": "set response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "01f6f6d8-e39e-420c-a9fe-79131650c8fb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f222c6c6135ff266ae8d7d94c4d1facc3dc70f6ff0b8c2d8b10c146a337f838"
+  },
+  "id": "ujUoyvg5RLCKHp00",
+  "tags": []
+}

@@ -1,0 +1,352 @@
+{
+  "name": "Multi-Agent Requirements Crew",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        -180
+      ],
+      "id": "37c8b9de-695a-4c59-8dcd-467f1ac65dfe",
+      "name": "When chat message received",
+      "webhookId": "48426b36-6827-422e-920a-9ab231e9a8a5"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        140
+      ],
+      "id": "183985c9-af70-47eb-ab7d-70853a49df8c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "im6XXXHIbcTbzi7y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Develop a user story specification",
+        "workflowId": {
+          "__rl": true,
+          "value": "dAIvayeszirn4JEz",
+          "mode": "list",
+          "cachedResultName": "sub_agent_analyst"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "requirement": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('requirement', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "requirement",
+              "displayName": "requirement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        340,
+        140
+      ],
+      "id": "19b5429a-a2b0-4573-b52f-9b09024c0b28",
+      "name": "requirement_analyst"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role\n\nYou are the other agents coordinator.\n\n# Scope\n\nYou receive a requirement from user as stated:\n\n{{ $json.chatInput }}\n\n# Command\n\nStep 1: use agent tool analyst to define the user story specification.\n\nStep 2: use agent tool reviewer to review the user story specification. \n\nStep 3: use agent tool qa_analyst to define the user story acceptances criteria.\n\nStep 4: use agent tool ux-ui_designer to design the User Intrface (UI) \n\n# Constraints:\n\n1. If reviewer conclude that \"needs_improve\" the user story specification must be analyzed again but no more than two revision is allowed.\n2. If reviewer conclusion is \"completed\" then answer with the final user story specification.\n\n\n",
+        "options": {
+          "systemMessage": "You are a helpful crew manager that coordinates the tasks using the agent tools"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        280,
+        -180
+      ],
+      "id": "d7b5a7e6-83fe-474c-aad0-cd24c4168bc2",
+      "name": "Master Router Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        140
+      ],
+      "id": "0a5bb3a8-8609-469a-b919-672afed2ddba",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Review the user story specification",
+        "workflowId": {
+          "__rl": true,
+          "value": "ohwgCSuJ5O5C43a4",
+          "mode": "list",
+          "cachedResultName": "sub_requirement_reviewer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "requirement": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('requirement', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "requirement",
+              "displayName": "requirement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        140
+      ],
+      "id": "69935d1e-38ec-473c-a760-3a9577eb6932",
+      "name": "requirement_reviewer"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n## Sub agents (crew)",
+        "height": 260,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        260,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "aaa317e4-3a69-4c66-9120-f4feba8624dd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "description": "Define user acceptances criteria to user story specification",
+        "workflowId": {
+          "__rl": true,
+          "value": "yc3sQRLMRuQgBjZ2",
+          "mode": "list",
+          "cachedResultName": "sub_qa_analyst"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "requirement": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('requirement', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "requirement",
+              "displayName": "requirement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        700,
+        140
+      ],
+      "id": "b0a47af1-c711-43d7-9866-6ae84b331090",
+      "name": "qa_analyst"
+    },
+    {
+      "parameters": {
+        "description": "Prototype the user interface for user story specification",
+        "workflowId": {
+          "__rl": true,
+          "value": "ujUoyvg5RLCKHp00",
+          "mode": "list",
+          "cachedResultName": "sub_ux-ui_designer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "requirement": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('requirement', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "requirement",
+              "displayName": "requirement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        860,
+        140
+      ],
+      "id": "2053eae0-6c9f-4d87-a2e1-41a60feeaa07",
+      "name": "ux_ui_specialist"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Master Router Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Master Router Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "requirement_analyst": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Router Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Master Router Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "requirement_reviewer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Router Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Master Router Agent": {
+      "main": [
+        []
+      ]
+    },
+    "qa_analyst": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Router Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ux_ui_specialist": {
+      "ai_tool": [
+        [
+          {
+            "node": "Master Router Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9d16ebff-ba2f-429d-bd73-3a8996dbaaa0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f222c6c6135ff266ae8d7d94c4d1facc3dc70f6ff0b8c2d8b10c146a337f838"
+  },
+  "id": "Cun8vvJAYgeyNV95",
+  "tags": [
+    {
+      "createdAt": "2025-06-07T06:10:40.634Z",
+      "updatedAt": "2025-06-07T06:10:40.634Z",
+      "id": "cEf6LLJsEwjVUIX8",
+      "name": "crew"
+    },
+    {
+      "createdAt": "2025-06-07T06:10:43.158Z",
+      "updatedAt": "2025-06-07T06:10:43.158Z",
+      "id": "YyHfhrp0tlG1QPhl",
+      "name": "requirement"
+    }
+  ]
+}

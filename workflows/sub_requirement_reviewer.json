@@ -1,0 +1,227 @@
+{
+  "name": "sub_requirement_reviewer",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "requirement"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "sub_requirement_reviewer",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -40,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "749ada86-3458-43aa-ab6a-8425c632c40b",
+              "name": "requirement",
+              "value": "={{ $json.requirement }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        180,
+        260
+      ],
+      "id": "3d67071c-c874-427f-ab2a-cdc78bbcbdc1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "749ada86-3458-43aa-ab6a-8425c632c40b",
+              "name": "requirement",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        180,
+        440
+      ],
+      "id": "727e974d-4944-4176-bd2b-5b8180aaea98",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -40,
+        440
+      ],
+      "id": "42a41305-61b7-488e-b74e-2f6c25fd01cf",
+      "name": "When chat message received",
+      "webhookId": "ef4416ff-f1eb-48e1-8cba-f69ad3c34f4f"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        420,
+        560
+      ],
+      "id": "4ba0253c-ef64-4602-b50e-308c4f4a10a8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "im6XXXHIbcTbzi7y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"conclusion\": {\n\t\t\t\"type\": \"stirng\",\n            \"enum\": [\"needs_refinement\",\"completed\"],\n          \"description\": \"Use 'needs_refinement' if a refinement is require or 'completed' if the specification does not require more refinement\"\n\t\t},\n\t\t\"analysis\": {\n            \"type\": \"strig\",\n          \"description\": \"Incluye a summary for SMART evaluation\"\n\t}\n  },\n  \"required\": [ \"conclusion\", \"analysis\" ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        620,
+        560
+      ],
+      "id": "90544dd5-799b-4096-ae10-35e11837130c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role\n\nRequirements (User Story) reviewer\n\n# Scope\n\n{{ $json.requirement }}\n\n# Command\n\nStep 1: Review the requirement considering the criteria (using SMART criterion):\n\n1. Must be specific\n2. Must be measurable\n3. Must be Attainable\n4. Must be Realistic\n5. Must be Timeable\n\nStep 2: You must generate a conclusion using SMART criteria and a final conclusion (refine or complete). The result must be generate using the following JSON document format:\n\n{\n  \"SMART\": \"Incluye a summary for SMART evaluation\",\n  \"conclusion\": \"refine o complete\"\n}\n\n# Contraints",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        440,
+        340
+      ],
+      "id": "0f61f73b-55b0-450c-a0dc-7ba85d929965",
+      "name": "AI Agent - Revisor de Requerimientos"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "sub_requirement_reviewer": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Revisor de Requerimientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Revisor de Requerimientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Revisor de Requerimientos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent - Revisor de Requerimientos",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e1e8f28d-6304-4392-9548-28a906609594",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f222c6c6135ff266ae8d7d94c4d1facc3dc70f6ff0b8c2d8b10c146a337f838"
+  },
+  "id": "ohwgCSuJ5O5C43a4",
+  "tags": [
+    {
+      "createdAt": "2025-06-07T06:10:40.634Z",
+      "updatedAt": "2025-06-07T06:10:40.634Z",
+      "id": "cEf6LLJsEwjVUIX8",
+      "name": "crew"
+    },
+    {
+      "createdAt": "2025-06-07T06:10:43.158Z",
+      "updatedAt": "2025-06-07T06:10:43.158Z",
+      "id": "YyHfhrp0tlG1QPhl",
+      "name": "requirement"
+    }
+  ]
+}
