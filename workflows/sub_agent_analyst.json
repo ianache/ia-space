@@ -1,0 +1,277 @@
+{
+  "name": "sub_agent_analyst",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        120
+      ],
+      "id": "cf8c733e-4713-4537-a837-e3f9eb4fe4c3",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "im6XXXHIbcTbzi7y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6835bd37-5990-4af6-962e-119dd322e63c",
+              "name": "requirement",
+              "value": "={{ $json.requirement }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -220,
+        -240
+      ],
+      "id": "5340ef3d-bac5-4df9-8f3d-495db985698c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "requirement"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -440,
+        -240
+      ],
+      "id": "38b29b99-cd5c-4344-be09-38936672f4eb",
+      "name": "swf_requirement_analyst"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Using the requirement: \n\n{{ $json.requirement }}\n\nINSTRUCTIONS:\n\n0. You must always answer in spanish\n1. Use the tools provided to obtain relevant information for all concepts related to the requirement.\n2. Only used information obtained using the tools.\n3. You must detail the requirements using the following format:\n\n# General\n\nUse the canonical User Story format, generate a precise declaration:\n\nAs [Persona], I need [Requirements], to [purpose]\n\n# Requirement list\n\nDefine a list of specific requirements that detail de user story.\nBe as specific as possible.\nBe objective\n\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        20,
+        -100
+      ],
+      "id": "aae3a7d5-e1a4-4f66-8cf5-ea9e47e330da",
+      "name": "analyst"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Proporcionar información considerando:\n\n1. Hoja \"Vocabulario\" contiene definiciones de conceptos",
+        "documentId": {
+          "__rl": true,
+          "value": "16SV5NxabQ2e-p09K6qUF54gPimj-QjQDxbtOQCzHJT0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Sheet', ``, 'string') }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        300,
+        120
+      ],
+      "id": "c1c5e022-f97e-4d40-bfe0-6782fc49e206",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TJVW1sdrNRrenSsY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0ecaeac-2290-4903-a418-39dd89b6a664",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        380,
+        -100
+      ],
+      "id": "d31ea914-5cd6-4b7a-9426-a7535cab42eb",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -440,
+        -60
+      ],
+      "id": "aa2ffb6b-e312-4c6b-bb86-684ec795473d",
+      "name": "When chat message received",
+      "webhookId": "442ce659-ce7d-4b39-b1b1-ad19128ac298"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4c8e628d-656d-40a6-b8be-18eb97954f4b",
+              "name": "requirement",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -220,
+        -60
+      ],
+      "id": "e7c7a034-a0f7-469e-b2aa-7404c3d985b9",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "swf_requirement_analyst": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "analyst",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyst": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "02b7b764-c038-43f0-a6e5-f0c43011cd09",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f222c6c6135ff266ae8d7d94c4d1facc3dc70f6ff0b8c2d8b10c146a337f838"
+  },
+  "id": "dAIvayeszirn4JEz",
+  "tags": [
+    {
+      "createdAt": "2025-06-07T06:10:40.634Z",
+      "updatedAt": "2025-06-07T06:10:40.634Z",
+      "id": "cEf6LLJsEwjVUIX8",
+      "name": "crew"
+    },
+    {
+      "createdAt": "2025-06-07T06:10:43.158Z",
+      "updatedAt": "2025-06-07T06:10:43.158Z",
+      "id": "YyHfhrp0tlG1QPhl",
+      "name": "requirement"
+    }
+  ]
+}
