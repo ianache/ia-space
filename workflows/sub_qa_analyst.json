@@ -1,0 +1,222 @@
+{
+  "name": "sub_qa_analyst",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "requirement"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -60,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b613f94a-d1c2-4d59-9763-7417626ff299",
+              "name": "requirement",
+              "value": "={{ $json.requirement }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        180
+      ],
+      "id": "26e6ec97-c9da-4882-8319-4dac3ad169d8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-05-20",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        520,
+        480
+      ],
+      "id": "1b340634-2223-4371-80ff-0ca5cd423fc0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "im6XXXHIbcTbzi7y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -60,
+        420
+      ],
+      "id": "3c25e940-4a94-4b1c-b66c-035171268d7a",
+      "name": "When chat message received",
+      "webhookId": "260a875f-ff87-4660-9ae4-a80cb6957d5d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b613f94a-d1c2-4d59-9763-7417626ff299",
+              "name": "requirement",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        420
+      ],
+      "id": "edae4085-d54d-4531-a2a4-b8706436986a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1fd0d32e-b2fd-4c5c-b783-2418ab6ab7bd",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        900,
+        300
+      ],
+      "id": "fe5e0ce3-7fe6-4fbd-8b95-5fec8f34ee0a",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role\n\nQuality Assurant Analyst\n\n# Scope\n\n{{ $json.requirement }}\n\n# Command\n\nStep 1: Define all acceptance criteria using Gherkin template.\n\nStep 2: Add a new session to user story requirement \"Acceptance Criteria\"\n\n# Contraints\n\nNone ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        540,
+        300
+      ],
+      "id": "6accc00c-5d86-47af-8b71-bdff49d028ec",
+      "name": "AI Agent - Analista QA"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Analista QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Analista QA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Analista QA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Analista QA": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "13613a72-d832-40c9-94dd-faf3b9efbb4a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f222c6c6135ff266ae8d7d94c4d1facc3dc70f6ff0b8c2d8b10c146a337f838"
+  },
+  "id": "yc3sQRLMRuQgBjZ2",
+  "tags": []
+}
