@@ -24,7 +24,7 @@ En el diagrama mostramos la arquitectura de los componentes base de Supabase, pl
     * **Propósito:** Vector es una herramienta de pipeline de datos observacionales (logs, métricas, trazas).
     * **Funcionalidad:** Actúa como un agente ligero para recolectar, transformar y enrutar datos de telemetría (principalmente logs en este contexto de "observability") desde varias fuentes hacia destinos como sistemas de análisis de logs, bases de datos de métricas, etc. Contribuye a la observabilidad general del sistema.
 
-* **kong (kong [ v2.8.1 ]) (Aparece dos veces, lo que podría indicar redundancia o instancias separadas para diferentes propósitos)**
+* **kong (kong [ v2.8.1 ])**
     * **Propósito:** Kong es una API Gateway de código abierto.
     * **Funcionalidad:** Actúa como un punto de entrada unificado para todas las solicitudes a la API. Proporciona funcionalidades clave como enrutamiento de API, autenticación, autorización, limitación de tasas, almacenamiento en caché, monitoreo y transformación de solicitudes. Es fundamental para la seguridad y la gestión del tráfico de las API.
 
@@ -39,6 +39,8 @@ En el diagrama mostramos la arquitectura de los componentes base de Supabase, pl
 La arquitectura describe un entorno Supabase, donde **PostgreSQL** es la base de datos principal, **Supavisor** gestiona las conexiones, **Kong** maneja las API, **Logflare** y **Vector** se encargan de la observabilidad y los logs, y **Supabase Studio** junto con **Postgres-meta** proporcionan las herramientas de gestión y la interfaz de usuario.
 
 ## Aseguramiento de Supabase
+
+![Diagrama 1](supabase_2.png)
 
 La imagen presenta un diagrama de arquitectura simplificado que parece enfocarse en los componentes de autenticación, base de datos y envío de correos electrónicos dentro de un ecosistema Supabase. A continuación, describo el propósito y la funcionalidad de cada componente:
 
