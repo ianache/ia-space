@@ -38,50 +38,38 @@ En el diagrama mostramos la arquitectura de los componentes base de Supabase, pl
 
 La arquitectura describe un entorno Supabase, donde **PostgreSQL** es la base de datos principal, **Supavisor** gestiona las conexiones, **Kong** maneja las API, **Logflare** y **Vector** se encargan de la observabilidad y los logs, y **Supabase Studio** junto con **Postgres-meta** proporcionan las herramientas de gestión y la interfaz de usuario.
 
-##
+## Aseguramiento de Supabase
 
 La imagen presenta un diagrama de arquitectura simplificado que parece enfocarse en los componentes de autenticación, base de datos y envío de correos electrónicos dentro de un ecosistema Supabase. A continuación, describo el propósito y la funcionalidad de cada componente:
 
 Componentes resaltados en amarillo (componentes externos o específicos):
 
-* mail server [ smtp ]
+* **mail server [ smtp ]**
 
-  * Propósito: Un servidor de correo electrónico genérico que utiliza el Protocolo Simple de Transferencia de Correo (SMTP).
+  * **Propósito**: Un servidor de correo electrónico genérico que utiliza el Protocolo Simple de Transferencia de Correo (SMTP).
+  * **Funcionalidad**: Es responsable de enviar correos electrónicos transaccionales o de notificación. En el contexto de Supabase, esto es crucial para funcionalidades como la confirmación de correo electrónico después de un registro, restablecimiento de contraseñas, notificaciones de cambios de correo electrónico, etc., que son manejadas por el servicio de autenticación.
 
-  * Funcionalidad: Es responsable de enviar correos electrónicos transaccionales o de notificación. En el contexto de Supabase, esto es crucial para funcionalidades como la confirmación de correo electrónico después de un registro, restablecimiento de contraseñas, notificaciones de cambios de correo electrónico, etc., que son manejadas por el servicio de autenticación.
+* **log flare analytics (supabase/logflare [ 1.14.2 ])**
 
-* log flare analytics (supabase/logflare [ 1.14.2 ])
-
- * Propósito: Logflare es una herramienta de agregación y análisis de logs.
-
- * Funcionalidad: Recopila, centraliza y permite analizar los logs generados por los otros componentes de la arquitectura, como gotrue y db. Esto es vital para la depuración, monitoreo de errores, seguimiento de eventos de seguridad (ej. intentos de inicio de sesión fallidos), y comprender el comportamiento de los servicios.
+  * **Propósito**: Logflare es una herramienta de agregación y análisis de logs.
+  * **Funcionalidad**: Recopila, centraliza y permite analizar los logs generados por los otros componentes de la arquitectura, como gotrue y db. Esto es vital para la depuración, monitoreo de errores, seguimiento de eventos de seguridad (ej. intentos de inicio de sesión fallidos), y comprender el comportamiento de los servicios.
 
 Componentes en blanco (componentes principales de Supabase):
 
-* gotrue (supabase/gotrue [ v2.174.0 ])
+* **gotrue (supabase/gotrue [ v2.174.0 ])**
 
- * Propósito: GoTrue es el servicio de autenticación de código abierto desarrollado por Supabase.
+  * **Propósito**: GoTrue es el servicio de autenticación de código abierto desarrollado por Supabase.
+  * **Funcionalidad**: Gestiona la autenticación de usuarios para las aplicaciones. Esto incluye:
+    - Registro de usuarios (con correo electrónico/contraseña, proveedores OAuth, etc.).
+    - Inicio de sesión y gestión de sesiones.
+    - Restablecimiento de contraseñas.
+    - Confirmación de correo electrónico.
+    - Gestión de tokens de acceso (JWT).
+    - Integración con políticas de seguridad a nivel de fila (RLS) en PostgreSQL. Es el cerebro detrás de la identificación y autorización de los usuarios que interactúan con tu aplicación y base de datos.
 
- * Funcionalidad: Gestiona la autenticación de usuarios para las aplicaciones. Esto incluye:
+* **db (supabase/postgres [ 15.8.1.060 ])**
 
-Registro de usuarios (con correo electrónico/contraseña, proveedores OAuth, etc.).
-
-Inicio de sesión y gestión de sesiones.
-
-Restablecimiento de contraseñas.
-
-Confirmación de correo electrónico.
-
-Gestión de tokens de acceso (JWT).
-
-Integración con políticas de seguridad a nivel de fila (RLS) en PostgreSQL.
-Es el cerebro detrás de la identificación y autorización de los usuarios que interactúan con tu aplicación y base de datos.
-
-* db (supabase/postgres [ 15.8.1.060 ])
-
- * Propósito: Este es el componente central de la base de datos relacional.
-
- * Funcionalidad: Proporciona la base de datos PostgreSQL donde se almacenan todos los datos de la aplicación. En el contexto de este diagrama, gotrue almacenaría los datos de los usuarios (hashes de contraseñas, correos electrónicos, etc.) en esta base de datos. Además, es donde se almacenarían todos los demás datos de tu aplicación. El ícono del cilindro representa la persistencia de los datos.
+  * **Propósito**: Este es el componente central de la base de datos relacional.
+  * **Funcionalidad**: Proporciona la base de datos PostgreSQL donde se almacenan todos los datos de la aplicación. En el contexto de este diagrama, gotrue almacenaría los datos de los usuarios (hashes de contraseñas, correos electrónicos, etc.) en esta base de datos. Además, es donde se almacenarían todos los demás datos de tu aplicación. El ícono del cilindro representa la persistencia de los datos.
 
 En resumen, esta arquitectura muestra cómo GoTrue maneja la autenticación y el envío de correos (a través del mail server), almacenando los datos de usuario en la base de datos PostgreSQL, mientras que Logflare se encarga de la observabilidad y el análisis de los eventos generados por estos servicios.
-
