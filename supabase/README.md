@@ -1,8 +1,10 @@
-[[_TOC_]]
-
 # Documentación Técnica
 
-La imagen muestra una arquitectura que parece estar relacionada con Supabase, una plataforma de código abierto para desarrollar aplicaciones. A continuación, describo el propósito y la funcionalidad que aporta cada componente, basándome en el nombre y la versión indicada:
+## Portal y Observabilidad
+
+![Diagrama 1](supabase_1.png)
+
+En el diagrama mostramos la arquitectura de los componentes base de Supabase, plataforma de código abierto para desarrollar aplicaciones. A continuación, describo el propósito y la funcionalidad que aporta cada componente, basándome en el nombre y la versión indicada:
 
 **Componentes resaltados en amarillo (core de Supabase o componentes clave):**
 
