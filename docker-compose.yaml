@@ -139,6 +139,54 @@ services:
       traefik.http.routers.n8n.rule: Host(`n8n.lab.iap.com`)
       traefik.http.routers.n8n.entrypoints: web
       traefik.http.services.n8n.loadbalancer.server.port: 5678
+  #
+  ## LiteLLM
+  #
+  litellm:
+    image: ghcr.io/berriai/litellm-database:${LITELLM_VERSION:-main-latest}
+    env_file:
+      - .env-litellm
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm/config.yaml:/app/config.yaml
+    command: --config /app/config.yaml --port 4000
+    networks:
+      - backend
+
+  #
+  ## OpenWeb UI
+  #
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:${OPENWEBUI_VERSION:-main}
+    ports:
+      - 8080:8080
+    env_file:
+      - .env-openwebui
+    volumes:
+      - openwebui-data:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    labels:
+      traefik.enable: true
+      traefik.http.routers.oi.rule: Host(`oi.lab.iap.com`)
+      traefik.http.routers.oi.entrypoints: web
+      traefik.http.services.oi.loadbalancer.server.port: 8080
+  #
+  ## Tailscale
+  #
+  tailscale:
+    image: tailscale/tailscale:${TAILSCALE_VERSION:-latest}
+    env_file:
+      - .env-tailscale
+    volumes:
+      - tailscale-data:/var/lib/tailscale    
+      - ./tailscale:/config
+      - /dev/net/tub:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
 
 networks:
   frontend:
@@ -150,3 +198,5 @@ volumes:
   pgvector-data:
   redis-data:
   n8n-data:
+  openwebui-data:
+  tailscale-data:

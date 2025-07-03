@@ -1,0 +1,9 @@
+model_list:
+  - model_name: gemini-2.0-flash
+    litellm_params:
+      model: gemini/gemini-2.0-flash-live-001
+    model_info:
+      mode: realtime
+
+general_settings:
+  master_key: os.environ/MASTER_KEY
