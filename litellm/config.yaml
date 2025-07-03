@@ -2,6 +2,7 @@ model_list:
   - model_name: gemini-2.0-flash
     litellm_params:
       model: gemini/gemini-2.0-flash-live-001
+      api_key: "os.environ/GEMINI_API_KEY"
     model_info:
       mode: realtime
 
