@@ -22,6 +22,20 @@ irm https://astral.sh/uv/install.ps1 | iex
 vagrant up
 ```
 
+## Vectors DB
+
+### QDrant
+
+```sql
+PUT collections/documents
+{
+  "vectors": {
+    "size": 768,
+    "distance": "Cosine"
+  }
+}
+```
+
 ## MCP Servers
 
 Se han creado los proyectos para los servicios usando el siguiente comando
